@@ -27,14 +27,14 @@ subtest 'Test for persons number range' => sub {
             vbl     => 999,
             persons => $num,
         ), "instance for $num person(s)";
-        is $brtd->_persons, $num, "$num persons";
+        is $brtd->persons, $num, "$num persons";
     }
     foreach my $num ( 4 .. 10 ) {
         ok my $brtd = Business::RO::TaxDeduction->new(
             vbl     => 999,
             persons => $num,
         ), "instance for $num person(s)";
-        is $brtd->_persons, 4, 'deduction for 4 persons';
+        is $brtd->persons, 4, 'deduction for 4 persons';
     }
 };
 

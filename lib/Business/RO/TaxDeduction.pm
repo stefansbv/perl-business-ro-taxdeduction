@@ -10,6 +10,7 @@ use Math::BigFloat;
 use Business::RO::Types qw(
     Int
     MathBigFloat
+    TaxPersons
 );
 
 has 'vbl' => (
@@ -20,20 +21,10 @@ has 'vbl' => (
 
 has 'persons' => (
     is       => 'ro',
-    isa      => Int,
+    isa      => TaxPersons,
     required => 1,
-);
-
-has '_persons' => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
-    lazy     => 1,
-    default  => sub {
-        my $self = shift;
-        die "A persons parameter is required!" unless defined $self->persons;
-        return $self->persons >= 4 ? 4 : $self->persons;
-    },
+    init_arg => 'persons',
+    coerce   => 1,
 );
 
 has '_deduction_map' => (
@@ -65,7 +56,7 @@ has 'ten' => (
 sub tax_deduction {
     my $self   = shift;
     my $vbl    = $self->round_050( $self->vbl );
-    my $amount = $self->get_deduction_for( $self->_persons );
+    my $amount = $self->get_deduction_for( $self->persons );
     if ( $vbl <= 1000 ) {
         return $amount;
     }
@@ -79,9 +70,7 @@ sub tax_deduction {
 
 sub tax_deduction_formula {
     my ( $self, $vbl, $base_deduction ) = @_;
-    my $amount  = Math::BigFloat->new(
-        $base_deduction * ( 1 - ( $vbl - 1000 ) / 2000 )
-    );
+    my $amount = $base_deduction * ( 1 - ( $vbl - 1000 ) / 2000 );
     return $self->round_10plus($amount);
 }
 
@@ -91,36 +80,29 @@ sub round_050 {
 }
 
 sub round_10plus {
-    my ( $self, $amount ) = @_;
-    my $amount_floor = $amount->copy()->bfloor();
-    my $amount_cmp   = $amount->copy()->bcmp($amount_floor);
-    # say "amount = ", $amount->bstr();
-    # say "floor  = ", $amount_floor->bstr();
-    # say "cmp    = >$amount_cmp<";
-    if ($amount_cmp == 0) {
-        # Integer amount
-        return $self->function_name($amount, 0); # RN==0
+    my ( $self, $para_amount ) = @_;
+    my $amount = Math::BigFloat->new($para_amount);
+    my $afloor = $amount->copy()->bfloor();
+    if ( $amount->is_int ) {
+        return $self->corrections($amount, $amount->is_int);
     }
     else {
-        # Real number amount
-        return $self->function_name($amount_floor, 1); # RN==1
+        return $self->corrections($afloor, $amount->is_int);
     }
 }
 
-sub function_name {
-    my ($self, $amount, $rn) = @_;
-    # say "amount = ", $amount->bstr();
+sub corrections {
+    my ($self, $amount, $is_int) = @_;
     my $amount_mod = $amount->copy()->bmod( $self->ten );
-    # say "mod    = ", $amount_mod->bstr();
     if ($amount_mod > 0) {
-        return $amount->bsub($amount_mod)->badd( $self->ten )->bstr();
+        return $amount->bsub($amount_mod)->badd( $self->ten );
     }
     else {
-        if ($rn == 1) {
-            return $amount->badd( $self->ten )->bstr();
+        if ($is_int == 0) {
+            return $amount->badd( $self->ten );
         }
         else {
-            return $amount->bstr();
+            return $amount;
         }
     }
 }
@@ -148,9 +130,24 @@ my $tax_deduction = Business::RO::TaxDeduction->new(
 
 =head2 C<vbl>
 
-The C<vbl> attribute holds the input VBL amount.
+The C<vbl> attribute holds the input amount.  (ro: Venit Brut Lunar).
+
+=head2 C<persons>
+
+The C<persons> attribute holds the number of persons.
 
 =head1 METHODS
+
+=head2 C<round_050>
+
+Custom rounding method.
+
+=head2 C<round_10plus>
+
+Round up to 10.  If the amount is an integer than calculate the modulo
+and...
+
+=head2 C<corrections>
 
 =head1 BUGS
 
