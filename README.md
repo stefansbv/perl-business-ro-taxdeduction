@@ -1,8 +1,8 @@
-Business-RO-CIF
-===============
+Business-RO-TaxDeduction
+========================
 Ștefan Suciu
-2015-06-13
+2015-10-27
 
-Version: 0.005
+Version: 0.001
 
-A module for Romanian CIF (Tax Identification Code) validation.
+Romanian salary tax deduction calculator.
