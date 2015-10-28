@@ -10,14 +10,14 @@ subtest 'Test for round_050' => sub {
             vbl     => 999,
             persons => 0,
         ), "instance for $amount and 0 persons";
-        is $brtd->round_050($amount), 249, "round $amount to 249";
+        is $brtd->_round_to_int($amount), 249, "round $amount to 249";
     }
     foreach my $amount (qw(249.5 249.59 249.6 249.99 250)) {
         ok my $brtd = Business::RO::TaxDeduction->new(
             vbl     => 999,
             persons => 0,
         ), "instance for $amount and 0 persons";
-        is $brtd->round_050($amount), 250, "round $amount to 250";
+        is $brtd->_round_to_int($amount), 250, "round $amount to 250";
     }
 };
 

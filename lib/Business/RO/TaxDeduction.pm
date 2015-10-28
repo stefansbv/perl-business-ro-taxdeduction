@@ -7,7 +7,7 @@ use utf8;
 use Moo;
 use MooX::HandlesVia;
 use Math::BigFloat;
-use Business::RO::Types qw(
+use Business::RO::TaxDeduction::Types qw(
     Int
     MathBigFloat
     TaxPersons
@@ -41,7 +41,7 @@ has '_deduction_map' => (
         };
     },
     handles => {
-        get_deduction_for => 'get',
+        _get_deduction_for => 'get',
     }
 );
 
@@ -55,56 +55,41 @@ has 'ten' => (
 
 sub tax_deduction {
     my $self   = shift;
-    my $vbl    = $self->round_050( $self->vbl );
-    my $amount = $self->get_deduction_for( $self->persons );
+    my $vbl    = $self->_round_to_int( $self->vbl );
+    my $amount = $self->_get_deduction_for( $self->persons );
     if ( $vbl <= 1000 ) {
         return $amount;
     }
     elsif ( ( $vbl > 1000 ) && ( $vbl <= 3000 ) ) {
-        return $self->tax_deduction_formula($vbl, $amount);
+        return $self->_tax_deduction_formula($vbl, $amount);
     }
     else {
-        return 0;
+        return 0;               # 0 for VBL > 3000
     }
 }
 
-sub tax_deduction_formula {
+sub _tax_deduction_formula {
     my ( $self, $vbl, $base_deduction ) = @_;
     my $amount = $base_deduction * ( 1 - ( $vbl - 1000 ) / 2000 );
-    return $self->round_10plus($amount);
+    return $self->_round_to_tens($amount);
 }
 
-sub round_050 {
+sub _round_to_int {
     my ( $self, $amount ) = @_;
     return int( $amount + 0.5 * ( $amount <=> 0 ) );
 }
 
-sub round_10plus {
+sub _round_to_tens {
     my ( $self, $para_amount ) = @_;
     my $amount = Math::BigFloat->new($para_amount);
-    my $afloor = $amount->copy()->bfloor();
-    if ( $amount->is_int ) {
-        return $self->corrections($amount, $amount->is_int);
-    }
-    else {
-        return $self->corrections($afloor, $amount->is_int);
-    }
-}
 
-sub corrections {
-    my ($self, $amount, $is_int) = @_;
-    my $amount_mod = $amount->copy()->bmod( $self->ten );
-    if ($amount_mod > 0) {
-        return $amount->bsub($amount_mod)->badd( $self->ten );
-    }
-    else {
-        if ($is_int == 0) {
-            return $amount->badd( $self->ten );
-        }
-        else {
-            return $amount;
-        }
-    }
+    return 0 if $amount == 0;
+
+    my $afloor  = $amount->copy()->bfloor();
+    my $amodulo = $afloor->copy()->bmod( $self->ten );
+
+    return $amount if $amount->is_int && $amodulo == 0;
+    return $afloor->bsub($amodulo)->badd( $self->ten );
 }
 
 1;
@@ -126,56 +111,51 @@ my $tax_deduction = Business::RO::TaxDeduction->new(
     persons => 3,
 );
 
-=head1 ATTRIBUTES
-
-=head2 C<vbl>
+=attr vbl
 
 The C<vbl> attribute holds the input amount.  (ro: Venit Brut Lunar).
 
-=head2 C<persons>
+=attr persons
 
 The C<persons> attribute holds the number of persons.
 
-=head1 METHODS
+=attr _deduction_map
 
-=head2 C<round_050>
+Holds the mapping between the number of persons and the a basic
+deduction amount.
 
-Custom rounding method.
+=attr ten
 
-=head2 C<round_10plus>
+A Math::BigFloat object instance for 10.
 
-Round up to 10.  If the amount is an integer than calculate the modulo
-and...
+=method tax_deduction
 
-=head2 C<corrections>
+Return the deduction calculated for the given amount.
 
-=head1 BUGS
+Uses the algorithm described in the document:
 
-Please report any bugs or feature requests to
-C<bug-business-ro-taxdeduction at rt.cpan.org>, or through the web
-interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-RO-TaxDeduction>.
-I will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
+"ORDINUL nr. 1.016/2005 din 18 iulie 2005 privind aprobarea deducerilor
+personale lunare pentru contribuabilii care realizează venituri din
+salarii la funcția de bază, începând cu luna iulie 2005, potrivit
+prevederilor Legii nr. 571/2003 privind Codul fiscal și ale Legii
+nr. 348/2004 privind denominarea monedei naționale"
 
-=head1 SUPPORT
+=method _tax_deduction_formula
 
-You can find documentation for this module with the perldoc command.
+Formula from the above document for calculating the tax deduction for
+amounts above 1000 RON and less or equal to 3000 RON.
 
-    perldoc Business::RO::TaxDeduction
+=method _round_to_int
 
-You can also look for information at:
+Custom rounding method to the nearest integer.  It uses the Romanian
+standard for rounding in bookkeeping.
 
-=over 4
+Example:
 
-=item * AnnoCPAN: Annotated CPAN documentation
+  10.01 -:- 10.49 => 10
+  10.50 -:- 10.99 => 11
 
-L<http://annocpan.org/dist/Business-RO-TaxDeduction>
+=method _round_to_tens
 
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Business-RO-TaxDeduction/>
-
-=back
-
-=cut
+Round up to tens.  Uses Math::BigFloat to prevent rounding errors like
+when amount minus floor(amount) gives something like 7.105427357601e-15.
