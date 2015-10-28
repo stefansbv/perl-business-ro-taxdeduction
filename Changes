@@ -1,4 +1,7 @@
 Revision history for Business-RO-TaxDeduction
 
+0.002   2015-10-28
+        Refactor round to tens method, add PODs.
+
 0.001   2015-08-07
         First version, released on an unsuspecting world.
