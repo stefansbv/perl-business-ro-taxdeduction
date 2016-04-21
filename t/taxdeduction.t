@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::Most;
+use Scalar::Util qw(blessed);
 
 use Business::RO::TaxDeduction;
 
@@ -53,7 +54,8 @@ subtest 'Test for 999 tax and 0..4 persons' => sub {
             vbl     => 999,
             persons => $num,
             ),
-            "Tax for 999 and $num persons";
+                "Tax for 999 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, $results->{$num},
             "Tax for $num persons and 999 VBL";
     }
@@ -65,6 +67,7 @@ subtest 'Test for 999 tax and 4..10 persons' => sub {
             vbl     => 999,
             persons => $num,
         ), "tax for 999 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, 650, "tax for $num persons and 999 VBL";
     }
 };
@@ -85,6 +88,7 @@ subtest 'Test for 1000 tax and 0..4 persons' => sub {
             persons => $num,
             ),
             "Tax for 1000 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, $results->{$num},
             "Tax for $num persons and 1000 VBL";
     }
@@ -96,6 +100,7 @@ subtest 'Test for 1000 tax and 4..10 persons' => sub {
             vbl     => 1000,
             persons => $num,
         ), "tax for 1000 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, 650, "tax for $num persons and 1000 VBL";
     }
 };
@@ -115,6 +120,7 @@ subtest 'Test for 1001 tax and 0..4 persons' => sub {
             vbl     => 1001,
             persons => $num,
         ), "Tax for 1001 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, $results->{$num},
             "Tax for $num persons and 1001 VBL";
     }
@@ -126,6 +132,7 @@ subtest 'Test for 1001 tax and 4..10 persons' => sub {
             vbl     => 1001,
             persons => $num,
         ), "tax for 1001 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, 650, "tax for $num persons and 1001 VBL";
     }
 };
@@ -145,6 +152,7 @@ subtest 'Test for 1080 tax and 0..4 persons' => sub {
             vbl     => 1080,
             persons => $num,
         ), "Tax for 1080 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, $results->{$num},
             "Tax for $num persons and 1080 VBL";
     }
@@ -156,6 +164,7 @@ subtest 'Test for 1080 tax and 4..10 persons' => sub {
             vbl     => 1080,
             persons => $num,
         ), "tax for 1080 and $num persons";
+        ok !blessed $brtd->tax_deduction, "not an object";
         is $brtd->tax_deduction, 630, "tax for $num persons and 1080 VBL";
     }
 };

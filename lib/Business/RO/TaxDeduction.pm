@@ -7,6 +7,7 @@ use utf8;
 use Moo;
 use MooX::HandlesVia;
 use Math::BigFloat;
+use Scalar::Util qw(blessed);
 use Business::RO::TaxDeduction::Types qw(
     Int
     MathBigFloat
@@ -61,7 +62,8 @@ sub tax_deduction {
         return $amount;
     }
     elsif ( ( $vbl > 1000 ) && ( $vbl <= 3000 ) ) {
-        return $self->_tax_deduction_formula($vbl, $amount);
+        $amount = $self->_tax_deduction_formula($vbl, $amount);
+        return ( blessed $amount ) ? $amount->bstr : $amount;
     }
     else {
         return 0;               # 0 for VBL > 3000
@@ -106,10 +108,11 @@ Romanian tax deduction calculator.
 
 use Business::RO::TaxDeduction;
 
-my $tax_deduction = Business::RO::TaxDeduction->new(
-    vbl     => 2345,
-    persons => 3,
-);
+    my $brtd = Business::RO::TaxDeduction->new(
+        vbl     => 2345,
+        persons => 3,
+    );
+    my $tax_deduction = $brtd->tax_deduction;
 
 =attr vbl
 

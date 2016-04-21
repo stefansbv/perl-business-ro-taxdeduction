@@ -1,3 +1,6 @@
+#
+# Test against the official deduction tables
+#
 use strict;
 use warnings;
 use Test::Most;
