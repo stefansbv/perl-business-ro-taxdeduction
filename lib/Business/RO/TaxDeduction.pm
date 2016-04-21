@@ -28,17 +28,18 @@ has 'persons' => (
     coerce   => 1,
 );
 
+# from 2016-01
 has '_deduction_map' => (
     is          => 'ro',
     handles_via => 'Hash',
     lazy        => 1,
     default     => sub {
         return {
-            0 => 250,
-            1 => 350,
-            2 => 450,
-            3 => 550,
-            4 => 650,
+            0 => 300,
+            1 => 400,
+            2 => 500,
+            3 => 600,
+            4 => 800,
         };
     },
     handles => {
@@ -58,10 +59,10 @@ sub tax_deduction {
     my $self   = shift;
     my $vbl    = $self->_round_to_int( $self->vbl );
     my $amount = $self->_get_deduction_for( $self->persons );
-    if ( $vbl <= 1000 ) {
+    if ( $vbl <= 1500 ) {
         return $amount;
     }
-    elsif ( ( $vbl > 1000 ) && ( $vbl <= 3000 ) ) {
+    elsif ( ( $vbl > 1500 ) && ( $vbl <= 3000 ) ) {
         $amount = $self->_tax_deduction_formula($vbl, $amount);
         return ( blessed $amount ) ? $amount->bstr : $amount;
     }
@@ -72,7 +73,7 @@ sub tax_deduction {
 
 sub _tax_deduction_formula {
     my ( $self, $vbl, $base_deduction ) = @_;
-    my $amount = $base_deduction * ( 1 - ( $vbl - 1000 ) / 2000 );
+    my $amount = $base_deduction * ( 1 - ( $vbl - 1500 ) / 1500 );
     return $self->_round_to_tens($amount);
 }
 
