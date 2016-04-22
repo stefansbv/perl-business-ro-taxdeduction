@@ -26,6 +26,7 @@ has 'persons' => (
     required => 1,
     init_arg => 'persons',
     coerce   => 1,
+    default  => sub { 0 },
 );
 
 has '_deduction_map' => (
@@ -120,7 +121,8 @@ The C<vbl> attribute holds the input amount.  (ro: Venit Brut Lunar).
 
 =attr persons
 
-The C<persons> attribute holds the number of persons.
+The C<persons> attribute holds the number of persons.  Not required,
+the default is 0.
 
 =attr _deduction_map
 
