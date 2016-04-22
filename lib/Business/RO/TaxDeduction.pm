@@ -28,7 +28,6 @@ has 'persons' => (
     coerce   => 1,
 );
 
-# from 2016-01
 has '_deduction_map' => (
     is          => 'ro',
     handles_via => 'Hash',
@@ -110,10 +109,10 @@ Romanian tax deduction calculator.
 use Business::RO::TaxDeduction;
 
     my $brtd = Business::RO::TaxDeduction->new(
-        vbl     => 2345,
+        vbl     => 1400,
         persons => 3,
     );
-    my $tax_deduction = $brtd->tax_deduction;
+    my $amount = $brtd->tax_deduction;
 
 =attr vbl
 
@@ -136,13 +135,23 @@ A Math::BigFloat object instance for 10.
 
 Return the deduction calculated for the given amount.
 
-Uses the algorithm described in the document:
+The current version (0.003) uses the algorithm described in the
+document:
+
+"ORDIN Nr. 52/2016 din 14 ianuarie 2016 privind aprobarea
+calculatorului pentru determinarea deducerilor personale lunare pentru
+contribuabilii care realizează venituri din salarii la funcţia de
+bază, începând cu luna ianuarie 2016, potrivit prevederilor art. 77
+alin. (2) şi ale art. 66 din Legea nr. 227/2015 privind Codul fiscal".
+
+The previous version (0.002) uses the algorithm described in the
+document:
 
 "ORDINUL nr. 1.016/2005 din 18 iulie 2005 privind aprobarea deducerilor
 personale lunare pentru contribuabilii care realizează venituri din
 salarii la funcția de bază, începând cu luna iulie 2005, potrivit
 prevederilor Legii nr. 571/2003 privind Codul fiscal și ale Legii
-nr. 348/2004 privind denominarea monedei naționale"
+nr. 348/2004 privind denominarea monedei naționale".
 
 =method _tax_deduction_formula
 
