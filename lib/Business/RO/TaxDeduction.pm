@@ -11,8 +11,8 @@ use Scalar::Util qw(blessed);
 use Business::RO::TaxDeduction::Types qw(
     Int
     MathBigFloat
-    TaxPersons
 );
+use Business::RO::TaxDeduction::Amount;
 
 has 'vbl' => (
     is       => 'ro',
@@ -20,31 +20,28 @@ has 'vbl' => (
     required => 1,
 );
 
-has 'persons' => (
+has 'year' => (
     is       => 'ro',
-    isa      => TaxPersons,
+    isa      => Int,
     required => 1,
-    init_arg => 'persons',
-    coerce   => 1,
-    default  => sub { 0 },
 );
 
-has '_deduction_map' => (
-    is          => 'ro',
-    handles_via => 'Hash',
-    lazy        => 1,
-    default     => sub {
-        return {
-            0 => 300,
-            1 => 400,
-            2 => 500,
-            3 => 600,
-            4 => 800,
-        };
+has 'persons' => (
+    is       => 'ro',
+    isa      => Int,
+    required => 1,
+);
+
+has 'deduction' => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return Business::RO::TaxDeduction::Amount->new(
+            year    => $self->year,
+            persons => $self->persons,
+        );
     },
-    handles => {
-        _get_deduction_for => 'get',
-    }
 );
 
 has 'ten' => (
@@ -58,7 +55,7 @@ has 'ten' => (
 sub tax_deduction {
     my $self   = shift;
     my $vbl    = $self->_round_to_int( $self->vbl );
-    my $amount = $self->_get_deduction_for( $self->persons );
+    my $amount = $self->deduction->amount;
     if ( $vbl <= 1500 ) {
         return $amount;
     }
