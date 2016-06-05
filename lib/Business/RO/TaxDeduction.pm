@@ -24,13 +24,13 @@ has 'vbl' => (
 has 'year' => (
     is       => 'ro',
     isa      => Int,
-    required => 1,
+    default  => sub { 2016 },
 );
 
 has 'persons' => (
     is       => 'ro',
     isa      => Int,
-    required => 1,
+    default  => sub { 0 },
 );
 
 has 'deduction' => (
@@ -145,10 +145,8 @@ the default is 0.
 
 =head3 deduction
 
-XXX:
-
-Holds the mapping between the number of persons and the a basic
-deduction amount.
+The C<deduction> attribute holds a
+C<Business::RO::TaxDeduction::Amount> object instance.
 
 =head3 ten
 
@@ -161,12 +159,12 @@ A Math::BigFloat object instance for 10.
 Return the deduction calculated for the given amount.
 
 Starting with the current version (0.004) the appropriate algorithm
-for the chosen year.
+for the tax deduction calculation year is chosen.
 
 =head3 _tax_deduction_formula
 
-Formula from the above document for calculating the tax deduction for
-amounts above 1000 RON and less or equal to 3000 RON.
+Formula for calculating the tax deduction for amounts above C<vbl_min>
+and less or equal to C<vbl_max>.
 
 =head3 _round_to_int
 
