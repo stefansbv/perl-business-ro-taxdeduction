@@ -24,7 +24,6 @@ subtest 'Test for persons number range' => sub {
 
 subtest 'Test for persons number range' => sub {
     ok my $ded = Business::RO::TaxDeduction::Amount->new(
-        persons => 0,
         year    => 2010,
         ), 'new instance';
     is $ded->amount, 250, '2010 and 0 persons';
@@ -44,19 +43,16 @@ subtest 'Test for persons number range' => sub {
 
     ok $ded = Business::RO::TaxDeduction::Amount->new(
         persons => 0,
-        year    => 2016,
         ), 'new instance';
     is $ded->amount, 300, '2016 and 0 persons';
 
     ok $ded = Business::RO::TaxDeduction::Amount->new(
         persons => 4,
-        year    => 2016,
         ), 'new instance';
     is $ded->amount, 800, '2016 and 4 persons';
 
     ok $ded = Business::RO::TaxDeduction::Amount->new(
         persons => 5,
-        year    => 2016,
         ), 'new instance';
     is $ded->amount, 800, '2016 and 5 persons';
 };
