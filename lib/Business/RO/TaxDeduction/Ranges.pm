@@ -8,24 +8,7 @@ use Moo;
 use Business::RO::TaxDeduction::Types qw(
     Int
 );
-
-has 'year' => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
-    default  => sub { 2016 },
-);
-
-has 'base_year' => (
-    is       => 'ro',
-    isa      => Int,
-    lazy     => 1,
-    default  => sub {
-        my $self = shift;
-        my $year = $self->year >= 2016  ? 2016 : 2005;
-        return $year;
-    },
-);
+with qw(Business::RO::TaxDeduction::Role::Utils);
 
 has 'vbl_min' => (
     is      => 'ro',
@@ -83,29 +66,32 @@ __END__
 
 =head1 SYNOPSIS
 
+    use Business::RO::TaxDeduction::Ranges;
+
+    my $tdr = Business::RO::TaxDeduction::Ranges->new(
+        year => $year,
+    );
+    my $vbl_min = $tdr->vbl_min;
+    my $vbl_max = $tdr->vbl_max;
+    my $f_min   = $tdr->f_min;
+    my $f_max   = $tdr->f_max;
 
 =head1 DESCRIPTION
 
+Data module.  This module holds data used in the tax deduction
+formula.
 
 =head1 INTERFACE
 
 =head2 ATTRIBUTES
 
-=head3 year
-
-The year in which the calculus.
-
-=head3 base_year
-
-The year from which the formula was introduced.
-
 =head3 vbl_min
 
-The minimum VBL used in the tax deduction formula.
+The minimum amount (VBL) used in the tax deduction formula.
 
 =head3 vbl_max
 
-The maximum VBL used in the tax deduction formula.
+The maximum amount (VBL) used in the tax deduction formula.
 
 =head3 f_min
 

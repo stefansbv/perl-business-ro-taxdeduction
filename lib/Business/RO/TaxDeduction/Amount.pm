@@ -1,6 +1,6 @@
 package Business::RO::TaxDeduction::Amount;
 
-# ABSTRACT: Personal deduction amount by year and persons
+# ABSTRACT: Personal deduction amount by year and number of persons
 
 use 5.010001;
 use utf8;
@@ -11,6 +11,7 @@ use Business::RO::TaxDeduction::Types qw(
     HashRef
     TaxPersons
 );
+with qw(Business::RO::TaxDeduction::Role::Utils);
 
 has 'persons' => (
     is       => 'ro',
@@ -18,12 +19,6 @@ has 'persons' => (
     required => 1,
     coerce   => 1,
     default  => sub { 0 },
-);
-
-has 'year' => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
 );
 
 has '_deduction_map_2005' => (
@@ -62,15 +57,9 @@ has '_deduction_map' => (
     lazy        => 1,
     default     => sub {
         my $self = shift;
-        if ($self->year >= 2016) {
-            return $self->_deduction_map_2016;
-        }
-        elsif ($self->year >= 2005) {
-            return $self->_deduction_map_2005;
-        }
-        else {
-            die "Tax deduction not available before 2005!";
-        }
+        my $year = $self->base_year;
+        my $meth = "_deduction_map_$year";
+        return $self->$meth;
     },
     handles => {
         _get_deduction_for => 'get',
@@ -88,3 +77,60 @@ has amount => (
 );
 
 1;
+
+__END__
+
+=encoding utf8
+
+=head1 SYNOPSIS
+
+    my $ded = Business::RO::TaxDeduction::Amount->new(
+        persons => 4,
+        year    => 2015,
+    );
+    say $ded->amount;
+
+=head1 DESCRIPTION
+
+Data module.  Personal deduction amount by year and number of persons.
+
+=head1 INTERFACE
+
+=head2 ATTRIBUTES
+
+=head3 persons
+
+Number of persons.  Coerced to 4 if is greater than 4.
+
+=head3 _deduction_map_2005
+
+Uses the amounts described in the document:
+
+"ORDINUL nr. 1.016/2005 din 18 iulie 2005 privind aprobarea deducerilor
+personale lunare pentru contribuabilii care realizează venituri din
+salarii la funcția de bază, începând cu luna iulie 2005, potrivit
+prevederilor Legii nr. 571/2003 privind Codul fiscal și ale Legii
+nr. 348/2004 privind denominarea monedei naționale".
+
+=head3 _deduction_map_2016
+
+Uses the amounts described in the document:
+
+"ORDIN Nr. 52/2016 din 14 ianuarie 2016 privind aprobarea
+calculatorului pentru determinarea deducerilor personale lunare pentru
+contribuabilii care realizează venituri din salarii la funcţia de
+bază, începând cu luna ianuarie 2016, potrivit prevederilor art. 77
+alin. (2) şi ale art. 66 din Legea nr. 227/2015 privind Codul fiscal".
+
+=head3 _deduction_map
+
+Choses the appropriate deduction map by year and returns the amount
+for the number of persons given as parameter.
+
+=head3 amount
+
+Returns the C<amount> using the C<_deduction_map> method.
+
+=head2 INSTANCE METHODS
+
+=cut
