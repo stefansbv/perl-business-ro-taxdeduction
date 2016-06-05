@@ -45,4 +45,18 @@ subtest 'Test for round_to_ten' => sub {
     }
 };
 
+subtest 'Test for failure and defaults' => sub {
+    ok my $brtd = Business::RO::TaxDeduction->new(
+        vbl     => 999,
+    ), "new instance";
+    is $brtd->tax_deduction, 300,
+        "Tax for year 2016 (default),  persons 0 (default) and VBL = 999";
+
+    throws_ok {
+        Business::RO::TaxDeduction->new();
+    }
+    qr/Missing required arguments: vbl/,
+        'throws: Missing required arguments: vbl';
+};
+
 done_testing;
