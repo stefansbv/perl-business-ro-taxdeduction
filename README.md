@@ -7,7 +7,7 @@ Version: 0.010
 
 A Romanian salary tax deduction calculator.
 
-Starting with the v0.004 version, there is a new optional `year`
+Starting with the v0.010 version, there is a new optional `year`
 parameter that can be used to choose between the current regulations
 (OMFP 52/2016), or the previous - OMFP 1016/2005.
 
