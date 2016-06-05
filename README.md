@@ -3,7 +3,7 @@ Business-RO-TaxDeduction
 Ștefan Suciu
 2016-06-05
 
-Version: 0.004
+Version: 0.010
 
 A Romanian salary tax deduction calculator.
 
