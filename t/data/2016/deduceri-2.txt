@@ -1,7 +1,7 @@
-# Deduceri pentru 2 persoana
+# Deduceri pentru 2 persoane
 # Tab separated columns
 #
-#VBL-min    VBL-max deducere
+#VBL-min	VBL-max	deducere
 0	1529	500
 1530	1559	490
 1560	1589	480

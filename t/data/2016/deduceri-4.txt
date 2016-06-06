@@ -1,7 +1,7 @@
-# Deduceri pentru 4 persoana
+# Deduceri pentru >=4 persoane
 # Tab separated columns
 #
-#VBL-min    VBL-max deducere
+#VBL-min	VBL-max	deducere
 0	1518	800
 1519	1537	790
 1538	1556	780
