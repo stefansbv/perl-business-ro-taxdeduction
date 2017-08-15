@@ -17,7 +17,9 @@ has 'persons' => (
     is       => 'ro',
     isa      => TaxPersons,
     required => 1,
-    coerce   => 1,
+    coerce   => sub {
+		$_[0] >= 4 ? 4 : $_[0];
+	},
     default  => sub { 0 },
 );
 

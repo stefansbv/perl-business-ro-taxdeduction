@@ -20,9 +20,6 @@ declare "TaxPersons",
     as "Int",
     where { $_ >= 0 && $_ <= 4 };
 
-coerce "TaxPersons",
-    from "Int", via { $_ >= 4 ? 4 : $_ };
-
 class_type MathBigFloat, { class => 'Math::BigFloat' };
 
 1;
