@@ -18,6 +18,7 @@ has 'vbl_min' => (
         my $self = shift;
         return 1000 if $self->base_year == 2005;
         return 1500 if $self->base_year == 2016;
+        return 1950 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -30,6 +31,7 @@ has 'vbl_max' => (
         my $self = shift;
         return 3000 if $self->base_year == 2005;
         return 3000 if $self->base_year == 2016;
+        return 3600 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -42,6 +44,7 @@ has 'f_min' => (
         my $self = shift;
         return 1000 if $self->base_year == 2005;
         return 1500 if $self->base_year == 2016;
+        return 1950 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -54,6 +57,7 @@ has 'f_max' => (
         my $self = shift;
         return 2000 if $self->base_year == 2005;
         return 1500 if $self->base_year == 2016;
+        return 1700 if $self->base_year == 2018;
         die "Not a valid year: " . $self->base_year;
     },
 );
@@ -80,6 +84,8 @@ __END__
 
 Data module.  This module holds data used in the tax deduction
 formula.
+
+NOTE: No tax deduction formula for 2018.
 
 =head1 INTERFACE
 
