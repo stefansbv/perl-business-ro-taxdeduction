@@ -5,12 +5,23 @@ package Business::RO::TaxDeduction::Role::Utils;
 use Moo::Role;
 use Business::RO::TaxDeduction::Types qw(
     Int
+    TaxPersons
+);
+
+has 'persons' => (
+    is       => 'ro',
+    isa      => TaxPersons,
+    required => 1,
+    coerce   => sub {
+        $_[0] >= 4 ? 4 : $_[0];
+    },
+    default  => sub { 0 },
 );
 
 has 'year' => (
     is       => 'ro',
     isa      => Int,
-    default  => sub { 2016 },
+    default  => sub { 2018 },
 );
 
 has 'base_year' => (
@@ -19,6 +30,9 @@ has 'base_year' => (
     lazy     => 1,
     default  => sub {
         my $self = shift;
+        if ($self->year >= 2018) {
+            return 2018;
+        }
         if ($self->year >= 2016) {
             return 2016;
         }
@@ -50,6 +64,10 @@ TaxDeduction::Amount and TaxDeduction::Ranges modules.
 =head1 INTERFACE
 
 =head2 ATTRIBUTES
+
+=head3 persons
+
+Number of persons.  Coerced to 4 if is greater than 4.
 
 =head3 year
 

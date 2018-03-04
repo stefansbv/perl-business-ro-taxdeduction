@@ -9,19 +9,8 @@ use MooX::HandlesVia;
 use Business::RO::TaxDeduction::Types qw(
     Int
     HashRef
-    TaxPersons
 );
 with qw(Business::RO::TaxDeduction::Role::Utils);
-
-has 'persons' => (
-    is       => 'ro',
-    isa      => TaxPersons,
-    required => 1,
-    coerce   => sub {
-		$_[0] >= 4 ? 4 : $_[0];
-	},
-    default  => sub { 0 },
-);
 
 has '_deduction_map_2005' => (
     is          => 'ro',
@@ -49,6 +38,21 @@ has '_deduction_map_2016' => (
             2 => 500,
             3 => 600,
             4 => 800,
+        };
+    },
+);
+
+has '_deduction_map_2018' => (
+    is          => 'ro',
+    isa         => HashRef,
+    lazy        => 1,
+    default     => sub {
+        return {
+            0 => 510,
+            1 => 670,
+            2 => 830,
+            3 => 990,
+            4 => 1310,
         };
     },
 );
@@ -88,7 +92,7 @@ __END__
 
     my $ded = Business::RO::TaxDeduction::Amount->new(
         persons => 4,
-        year    => 2015,
+        year    => 2018,
     );
     say $ded->amount;
 
@@ -99,10 +103,6 @@ Data module.  Personal deduction amount by year and number of persons.
 =head1 INTERFACE
 
 =head2 ATTRIBUTES
-
-=head3 persons
-
-Number of persons.  Coerced to 4 if is greater than 4.
 
 =head3 _deduction_map_2005
 
@@ -123,6 +123,15 @@ calculatorului pentru determinarea deducerilor personale lunare pentru
 contribuabilii care realizează venituri din salarii la funcţia de
 bază, începând cu luna ianuarie 2016, potrivit prevederilor art. 77
 alin. (2) şi ale art. 66 din Legea nr. 227/2015 privind Codul fiscal".
+
+=head3 _deduction_map_2018
+
+Uses the amounts described in the document:
+
+ORDONANȚĂ DE URGENȚĂ Nr. 79/2017 din 8 noiembrie 2017 pentru
+modificarea și completarea Legii nr. 227/2015 privind Codul fiscal
+EMITENT: GUVERNUL ROMÂNIEI PUBLICATĂ ÎN: MONITORUL OFICIAL NR. 885 din
+10 noiembrie 2017
 
 =head3 _deduction_map
 
