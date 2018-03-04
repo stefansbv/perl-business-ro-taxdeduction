@@ -1,5 +1,10 @@
 Revision history for Business-RO-TaxDeduction
 
+0.012   2018-03-04
+        Update for 2018 - OUG79/2017.
+        No more an official formula for calculating the tax deduction,
+        so the module is using (hash) tables for 2018.
+
 0.011   2017-08-15
         Bugfix release.
         Fix for "Invalid coerce '1'".
