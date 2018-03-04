@@ -14,6 +14,7 @@ use Business::RO::TaxDeduction::Types qw(
 );
 use Business::RO::TaxDeduction::Amount;
 use Business::RO::TaxDeduction::Ranges;
+use Business::RO::TaxDeduction::Table;
 
 has 'vbl' => (
     is       => 'ro',
@@ -24,7 +25,7 @@ has 'vbl' => (
 has 'year' => (
     is       => 'ro',
     isa      => Int,
-    default  => sub { 2016 },
+    default  => sub { 2018 },
 );
 
 has 'persons' => (
@@ -68,6 +69,9 @@ has 'ten' => (
 sub tax_deduction {
     my $self   = shift;
     my $vbl    = $self->_round_to_int( $self->vbl );
+
+    return $self->_amount_for_2018 if $self->year >= 2018;
+
     my $amount = $self->deduction->amount;
     if ( $vbl <= $self->vbl_min ) {
         return $amount;
@@ -103,6 +107,16 @@ sub _round_to_tens {
 
     return $amount if $amount->is_int && $amodulo == 0;
     return $afloor->bsub($amodulo)->badd( $self->ten );
+}
+
+sub _amount_for_2018 {
+    my $self = shift;
+    my $table =  Business::RO::TaxDeduction::Table->new(
+        year    => $self->year,
+        persons => $self->persons,
+        vbl     => $self->vbl,
+    );
+    return $table->deduction;
 }
 
 1;
@@ -151,6 +165,10 @@ C<Business::RO::TaxDeduction::Amount> object instance.
 =head3 ten
 
 A Math::BigFloat object instance for 10.
+
+=head3 five
+
+A Math::BigFloat object instance for 5.
 
 =head2 INSTANCE METHODS
 
